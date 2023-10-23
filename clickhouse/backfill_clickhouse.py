@@ -15,7 +15,7 @@ def get_payload(
     target_table='default.response_copy_v2',
     source_table='request_response_clickhouse',
 ) -> str:
-    payload = f'''
+    return f'''
 INSERT INTO {target_table}
 SELECT *
 FROM postgresql('{postgres_url}', 'postgres', '{source_table}', 'postgres', '{postgres_password}') as x
@@ -24,7 +24,6 @@ WHERE (
     AND x.request_created_at >= toDateTime('{date_step}', 'UTC') - INTERVAL '1 {step}'
 );
             '''
-    return payload
 
 
 def deduplicate():

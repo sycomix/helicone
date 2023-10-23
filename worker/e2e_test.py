@@ -31,9 +31,9 @@ def assert_stream_and_not_stream_same_tokens(**kwargs):
     }
     kwargs["stream"] = True
     if kwargs.get("messages"):
-        [resp for resp in openai.ChatCompletion.create(**kwargs)]
+        list(openai.ChatCompletion.create(**kwargs))
     else:
-        [resp for resp in openai.Completion.create(**kwargs)]
+        list(openai.Completion.create(**kwargs))
     time.sleep(.5)
     notStreamedUsage = supabase.table('response').select(
         "*").eq("request", notStreamRequestId).single().execute().data.get("body").get("usage")
@@ -51,7 +51,7 @@ def test_streamed_response_delays():
 
     start_time = time.time()
     count = 0
-    for resp in openai.Completion.create(model='text-davinci-003',
+    for _ in openai.Completion.create(model='text-davinci-003',
                                          prompt="write me a poem'\n",
                                          max_tokens=10,
                                          temperature=0,
@@ -65,11 +65,15 @@ def test_streamed_response_delays():
 
 def test_streamed_response():
     print("testing streamed response")
-    responses = [resp for resp in openai.Completion.create(model='text-davinci-003',
-                                                           prompt="ONLY RESPOND 'hi'\n",
-                                                           max_tokens=2,
-                                                           temperature=0,
-                                                           stream=True)]
+    responses = list(
+        openai.Completion.create(
+            model='text-davinci-003',
+            prompt="ONLY RESPOND 'hi'\n",
+            max_tokens=2,
+            temperature=0,
+            stream=True,
+        )
+    )
 
     streamed_response = "".join(
         [resp["choices"][0]["text"] for resp in responses])
@@ -79,16 +83,15 @@ def test_streamed_response():
 
 def test_streamed_chat_response():
     print("testing streamed response")
-    responses = [resp for resp in openai.ChatCompletion.create(model='gpt-3.5-turbo',
-                                                               messages=[
-                                                                   {
-                                                                       "role": "system",
-                                                                       "content": "ONLY RESPOND 'hi'\n"
-                                                                   }
-                                                               ],
-                                                               max_tokens=2,
-                                                               temperature=0,
-                                                               stream=True)]
+    responses = list(
+        openai.ChatCompletion.create(
+            model='gpt-3.5-turbo',
+            messages=[{"role": "system", "content": "ONLY RESPOND 'hi'\n"}],
+            max_tokens=2,
+            temperature=0,
+            stream=True,
+        )
+    )
 
     streamed_response = "".join(
         [resp["choices"][0]["delta"]["content"] for resp in responses if resp["choices"][0]["delta"].get("content")])
@@ -148,7 +151,7 @@ def test_cached_response():
 
 
 async def create_completion_async(model, prompt, max_tokens, temperature):
-    url = f"https://api.openai.com/v1/completions"
+    url = "https://api.openai.com/v1/completions"
     headers = {
         "Authorization": f"Bearer {openai.api_key}",
         "Content-Type": "application/json",

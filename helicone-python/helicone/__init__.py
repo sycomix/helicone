@@ -186,9 +186,8 @@ class Helicone:
 
         if inspect.isgenerator(result):
             return result_with_helicone()
-        else:
-            self.update_response_headers(result, helicone_request_id)
-            return result
+        self.update_response_headers(result, helicone_request_id)
+        return result
 
     async def _modify_result_async(self, result, helicone_request_id):
         async def result_with_helicone_async():
@@ -198,9 +197,8 @@ class Helicone:
 
         if inspect.isasyncgen(result):
             return result_with_helicone_async()
-        else:
-            self.update_response_headers(result, helicone_request_id)
-            return result
+        self.update_response_headers(result, helicone_request_id)
+        return result
 
     def _with_helicone_auth(self, func):
         @functools.wraps(func)

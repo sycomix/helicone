@@ -118,10 +118,7 @@ def hash(key: str) -> str:
     # Update the hash object with the key bytes
     sha256.update(key_bytes)
 
-    # Get the hexadecimal digest of the hash
-    hashed_key_hex = sha256.hexdigest()
-
-    return hashed_key_hex
+    return sha256.hexdigest()
 
 
 def fetch_feedback(helicone_id):
